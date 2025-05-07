@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
             // Lấy thông tin người dùng từ API
             console.log('Đang lấy thông tin người dùng...');
-            const response = await fetch('https://localhost:5191/api/Auth/user-info', {
+            const response = await fetch('https://localhost:7088/api/Auth/user-info', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     throw new Error('Token không tồn tại hoặc đã hết hạn. Vui lòng đăng nhập lại.');
                 }
 
-                const userResponse = await fetch('https://localhost:5191/api/Auth/user-info', {
+                const userResponse = await fetch('https://localhost:7088/api/Auth/user-info', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     body.email = email;
                 }
 
-                const response = await fetch('https://localhost:5191/api/Auth/update', {
+                const response = await fetch('https://localhost:7088/api/Auth/update', {
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,

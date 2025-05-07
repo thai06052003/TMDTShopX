@@ -12,13 +12,13 @@
 </head>
 
 <body class="bg-gray-100">
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex">
         <!-- Sidebar -->
         <div id="sidebar">
             <!-- Sidebar động sẽ load vào đây -->
         </div>
 
-        <div class="content-area flex-1 overflow-auto">
+        <div class="content-area flex-1">
 
             <!-- Header -->
             <div id="header">
@@ -28,39 +28,71 @@
             <!-- Content -->
             <div id="app">
                 <main class="p-6 mx-auto">
-                    <section class="mt-10 bg-white shadow rounded-lg p-6">
-                        <h2 class="text-2xl font-bold mb-4">Quản lý sản phẩm</h2>
-                        <div class="flex justify-between mb-4">
-                            <form id="searchForm" method="GET" class="flex w-1/2">
-                                <input type="text" id="searchInput" name="search" placeholder="Tìm kiếm sản phẩm..."
-                                    class="p-2 border rounded-l w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button type="submit" id="searchBtn"
-                                    class="bg-blue-500 text-white px-6 rounded-r hover:bg-blue-600 transition duration-200">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </form>
-                            <a href="create.html" id="addProductBtn"
-                                class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"><i
-                                    class="fas fa-plus-circle mr-1"></i>Thêm
-                                sản phẩm</a>
+                    <section class="mt-10 bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-6 text-gray-800">Quản lý sản phẩm</h2>
+                            <div
+                                class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                                <form id="searchForm" method="GET" class="flex w-full md:w-1/2">
+                                    <input type="text" id="searchInput" name="search" placeholder="Tìm kiếm sản phẩm..."
+                                        class="p-2 border border-gray-300 rounded-l w-full shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+
+                                    <button type="submit" id="searchBtn"
+                                        class="bg-blue-600 text-white px-5 rounded-r hover:bg-blue-700 transition duration-150 ease-in-out shadow-sm">
+
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </form>
+                                <a href="create.html" id="addProductBtn"
+                                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-150 ease-in-out shadow-sm whitespace-nowrap">
+
+                                    <i class="fas fa-plus mr-1"></i>Thêm sản phẩm
+                                </a>
+                            </div>
                         </div>
-                        <table class="min-w-full bg-white border rounded-lg shadow-md">
-                            <thead class="bg-gray-200 text-gray-700">
-                                <tr>
-                                    <th class="py-3 px-4 border-b text-left">STT</th>
-                                    <th class="py-3 px-4 border-b text-left">Tên sản phẩm</th>
-                                    <th class="py-3 px-4 border-b text-left">Ảnh</th>
-                                    <th class="py-3 px-4 border-b text-left">Giá</th>
-                                    <th class="py-3 px-4 border-b text-left">Danh mục</th>
-                                    <th class="py-3 px-4 border-b text-left">Số lượng</th>
-                                    <th class="py-3 px-4 border-b text-left">Trạng thái</th>
-                                    <th class="py-3 px-4 border-b text-left w-[180px]">Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productTableBody" class="text-gray-600">
-                                <!-- Data -->
-                            </tbody>
-                        </table>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            STT
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Tên sản
+                                            phẩm</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Ảnh
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Giá
+                                        </th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Danh
+                                            mục</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Số
+                                            lượng</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Trạng
+                                            thái</th>
+                                        <th scope="col"
+                                            class="px-6 py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                            Hành
+                                            động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody" class="bg-white divide-y divide-gray-200">
+
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
                     <!-- Pagination -->
                     <div class="flex justify-between items-center mt-6">
@@ -77,13 +109,14 @@
                     </div>
                 </main>
             </div>
+            <!-- Footer -->
+            <div id="footer">
+                <!-- Footer động sẽ load vào đây -->
+            </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <div id="footer">
-        <!-- Footer động sẽ load vào đây -->
-    </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="/Admin/assets/js/custom.js"></script>
@@ -98,9 +131,6 @@
             const totalPagesSpan = document.getElementById('totalPages');
             const prevPageBtn = document.getElementById('prevPage');
             const nextPageBtn = document.getElementById('nextPage');
-
-            // --- Thay đổi URL này nếu API của bạn chạy trên domain/port khác ---
-            const API_BASE_URL = 'https://localhost:7088/api';
 
             let currentPage = 1;
             let totalPages = 1;
@@ -207,19 +237,21 @@
                     // Nếu API và frontend khác origin, hoặc ảnh được lưu ở nơi khác, bạn cần thêm tiền tố
                     const imageDisplayUrl = getImageUrl(product.imageURL)
 
-                    const active = `<button onclick="changeStatus(2001)"
-                                            class="bg-green-500 text-white py-1 w-36 rounded text-center hover:bg-green-600">
-                                            Đang bán
-                                        </button>`
-                    const notActive = `<button onclick="changeStatus(2001)"
-                                            class="bg-gray-500 text-white py-1 w-36 rounded text-center hover:bg-gray-600">
-                                            Đã ngừng bán
-                                        </button>`
+                     // Khi click sẽ gọi changeStatus với ID sản phẩm và trạng thái MỚI mong muốn
+                    const statusButtonHtml = product.isActive
+                        ? `<button onclick="changeStatus(${product.productID}, false)"
+                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white justify-center bg-green-500 w-24 hover:bg-green-600" title="Nhấp để ngừng bán">
+                        Đang bán
+                    </button>`
+                        : `<button onclick="changeStatus(${product.productID}, true)"
+                        class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full text-white justify-center bg-gray-500 w-24 hover:bg-gray-600" title="Nhấp để bán lại">
+                        Ngừng bán
+                    </button>`;
 
                     row.innerHTML = `
-                <td class="py-3 px-4 border-b">${stt}</td>
+                <td class="py-3 px-4 border-b text-center">${stt}</td>
                 <td class="py-4 px-6 border-b">
-                    <div class="break-words whitespace-normal line-clamp-2">${product.productName || 'N/A'}</div></td>
+                    <div class="product-name-ellipsis">${product.productName || 'N/A'}</div></td>
                 <td class="py-3 px-4 border-b">
                     <img src="${imageDisplayUrl}"
                          alt="${product.productName || 'Sản phẩm'}" class="w-20 h-20 object-cover rounded">
@@ -227,23 +259,11 @@
                 <td class="py-3 px-4 border-b">${formatCurrency(product.price)}</td>
                 <td class="py-2 px-4 border-b">${product.categoryName || 'N/A'}</td>
                 <td class="py-3 px-4 border-b">${product.stockQuantity !== undefined ? product.stockQuantity : 'N/A'}</td>  <!-- Kiểm tra stockQuantity tồn tại -->
-                <td class="py-3 px-4 border-b">${product.isActive == true ? active : notActive}</td>
-                <td class="py-3 px-4 border-b flex flex-col gap-y-2">
-                    <a href="update.html?id=${product.productID}"
-                       class="bg-sky-500 text-white text-center px-3 py-1 rounded hover:bg-sky-600 transition duration-200 edit-btn "
-                       data-id="${product.productID}">
-                        <i class="fas fa-info-circle"></i> Xem
-                    </a>
-                    <a href="update.html?id=${product.productID}"
-                       class="bg-yellow-500 text-white text-center px-3 py-1 rounded hover:bg-yellow-600 transition duration-200 edit-btn  my-2"
-                       data-id="${product.productID}">
-                        <i class="fas fa-edit mr-1"></i> Sửa
-                    </a>
-                    <button type="button"
-                       class="bg-red-500 text-white text-center px-3 py-1 rounded hover:bg-red-600 transition duration-200 delete-btn my-2"
-                       data-id="${product.productID}">
-                        <i class="fas fa-trash-alt mr-1"></i> Xóa
-                    </button>
+                <td class="py-3 px-4 border-b">${statusButtonHtml}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-3">
+                    <a href="view.html?id=${product.productID}" class="text-blue-600 hover:text-blue-900 transition duration-150 ease-in-out" title="Xem chi tiết"><i class="fas fa-eye fa-fw"></i></a>
+                    <a href="update.html?id=${product.productID}" class="text-yellow-500 hover:text-yellow-700 transition duration-150 ease-in-out" title="Sửa"><i class="fas fa-edit fa-fw"></i></a>
+                    <button type="button" class="text-red-600 hover:text-red-800 transition duration-150 ease-in-out delete-btn" data-id="${product.productID}" title="Xóa vĩnh viễn"><i class="fas fa-trash-alt fa-fw"></i></button>
                 </td>
             `;
                     productTableBody.appendChild(row);

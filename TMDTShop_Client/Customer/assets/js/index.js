@@ -128,3 +128,54 @@ displayAccountName();
       });
   }
 });
+
+function getRoleFromToken() {
+    // 1. Lấy token từ Session Storage
+    const token = sessionStorage.getItem('token');
+
+    if (!token) {
+        console.error('Không tìm thấy token trong Session Storage.');
+        return null; // Hoặc trả về giá trị mặc định/xử lý lỗi khác
+    }
+
+    try {
+        // 2. Tách lấy phần payload (phần thứ 2)
+        // Phần payload là chuỗi Base64Url
+        const payloadBase64Url = token.split('.')[1];
+        if (!payloadBase64Url) {
+            console.error('Định dạng token không hợp lệ: Thiếu payload.');
+            return null;
+        }
+
+
+        // 3. Chuyển đổi Base64Url thành Base64 chuẩn (thay thế '-' bằng '+' và '_' bằng '/')
+        let payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+        // Thêm padding '=' nếu cần thiết (Base64 yêu cầu độ dài là bội số của 4)
+        // Hàm atob cần điều này
+        const padding = payloadBase64.length % 4;
+        if (padding) {
+            payloadBase64 += '='.repeat(4 - padding);
+        }
+
+        // Giải mã Base64 thành chuỗi JSON
+        const decodedPayloadString = atob(payloadBase64); // atob là hàm có sẵn của trình duyệt
+
+        // 4. Phân tích chuỗi JSON thành đối tượng JavaScript
+        const payloadObject = JSON.parse(decodedPayloadString);
+
+        // 5. Lấy giá trị của thuộc tính 'role'
+        const userRole = payloadObject.role;
+
+        if (userRole === undefined) {
+            console.warn('Thuộc tính "role" không tồn tại trong payload của token.');
+            return null; // Hoặc giá trị mặc định
+        }
+
+        return userRole;
+
+    } catch (error) {
+        console.error('Lỗi khi giải mã hoặc phân tích token:', error);
+        return null; // Xử lý lỗi
+    }
+}
