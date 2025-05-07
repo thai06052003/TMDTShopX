@@ -249,10 +249,7 @@ async function handleSocialLogin(user) {
   const userData = {
     email: user.email,
     provider: provider,
-    userId: user.uid,
-    displayName: user.displayName || '',
-    photoURL: user.photoURL || '',
-    phoneNumber: user.phoneNumber || ''
+    UserId: user.uid
   };
 
   try {

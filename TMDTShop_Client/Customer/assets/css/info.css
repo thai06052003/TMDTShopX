@@ -76,3 +76,56 @@
     height: 10px;
   }
   
+/* Tab styles */
+.tab-content {
+    display: none;
+}
+.tab-content.active {
+    display: block;
+}
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+    background: none;
+    border-left: 4px solid transparent;
+}
+.tab-button.active {
+    border-left: 4px solid #2563eb;
+    background-color: #EFF6FF;
+    color: #2563eb;
+}
+.tab-button:not(.active) {
+    color: #374151;
+    background: none;
+}
+.tab-button:hover:not(.active) {
+    background-color: #F3F4F6;
+}
+
+/* Avatar upload styles */
+.avatar-upload {
+    position: relative;
+}
+.avatar-upload .upload-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: #2563eb;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.avatar-upload .upload-btn:hover {
+    background: #1d4ed8;
+}
+.avatar-upload input[type="file"] {
+    display: none;
+}
+  
