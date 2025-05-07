@@ -11,5 +11,7 @@ namespace ShopxEX1.Dtos.Categories
 
         [StringLength(255, ErrorMessage = "Mô tả không được vượt quá 255 ký tự.")]
         public string? Description { get; set; }
+        [StringLength(255, ErrorMessage = "Link ảnh không được vượt quá 255 ký tự.")]
+        public string? Image { get; set; }
     }
 }

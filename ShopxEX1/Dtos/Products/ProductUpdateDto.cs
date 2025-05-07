@@ -7,8 +7,8 @@ namespace ShopxEX1.Dtos.Products
     public class ProductUpdateDto
     {
         [Required][StringLength(100)] public string ProductName { get; set; } = string.Empty;
-        public int? CategoryID { get; set; }
-        public int? SellerCategoryID { get; set; }
+        [Required] public int CategoryID { get; set; }
+        [Required] public int SellerCategoryID { get; set; }
         [StringLength(4000)] public string? Description { get; set; }
         [Required][Range(0.01, double.MaxValue)][Column(TypeName = "decimal(18, 2)")] public decimal Price { get; set; }
         [Required][Range(0, int.MaxValue)] public int StockQuantity { get; set; }

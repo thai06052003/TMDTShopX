@@ -1,132 +1,233 @@
+﻿// --- Thêm các using cần thiết ---
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using ShopxEX1.Models;
-using ShopxEX1.Data;
-using ShopxEX1.Services;
-using ShopxEX1.Services.Implementations; // Thêm namespace của AuthService
-using System.Text;
+using Microsoft.OpenApi.Models; // Cho Swagger JWT
+using ShopxEX1.Data;          // Namespace Data
+using ShopxEX1.Mappings;      // Namespace Mappings
+using ShopxEX1.Services;      // Namespace Interfaces
+using ShopxEX1.Services.Implementations; // Namespace Implementations
 using System.IdentityModel.Tokens.Jwt;
-using AutoMapper;
-using ShopxEX1.Dtos;
+using System.Reflection;
 using System.Security.Claims;
-using ShopxEX1.Mappings;
+using System.Text;
+using ShopxEX1.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllers();
-
-// Add HttpContextAccessor
-builder.Services.AddHttpContextAccessor();
-
-// Configure Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+namespace ShopxEX1 // Namespace gốc
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopxEX1 API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    public class Program
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+        public static void Main(string[] args)
         {
-            new OpenApiSecurityScheme
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Cấu hình logging
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+
+            // --- Phần khởi tạo Firebase Admin SDK ---
+            try
             {
-                Reference = new OpenApiReference
+                var firebaseSdkPath = builder.Configuration["FirebaseAdminSdkPath"]; // Đọc đường dẫn từ cấu hình
+
+                if (string.IsNullOrEmpty(firebaseSdkPath))
                 {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Console.WriteLine("ERROR: FirebaseAdminSdkPath is not configured in appsettings.json or environment variables.");
                 }
-            },
-            Array.Empty<string>()
+                else if (!File.Exists(firebaseSdkPath))
+                {
+                    Console.WriteLine($"ERROR: Firebase Admin SDK key file not found at path: {firebaseSdkPath}");
+                }
+                else
+                {
+                    FirebaseApp.Create(new AppOptions()
+                    {
+                        Credential = GoogleCredential.FromFile(firebaseSdkPath),
+                    });
+                    Console.WriteLine("Firebase Admin SDK Initialized Successfully.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"FATAL ERROR: Could not initialize Firebase Admin SDK. Exception: {ex.Message}");
+            }
+
+            // 1. CORS Configuration (Đơn giản hóa)
+            var MyAllowSpecificOrigins = "AllowMyAppOrigins";
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: MyAllowSpecificOrigins,
+                                  policyBuilder =>
+                                  {
+                                      // *** CHỈ ĐỊNH RÕ ORIGIN FRONTEND CỦA BẠN ***
+                                      policyBuilder.WithOrigins(
+                                            builder.Configuration.GetValue<string>("AppSettings:CorsAllowedOrigins")?.Split(',') ?? // Đọc từ appsettings
+                                            new[] { "http://127.0.0.1:5500", "http://localhost:5500", "https://127.0.0.1:5500", "https://localhost:5500" } // Fallback nếu không có config
+                                          )
+                                           .AllowAnyHeader()
+                                           .AllowAnyMethod();
+                                      // .AllowCredentials(); // Nếu cần
+                                  });
+            });
+
+            // 2. DbContext Configuration
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("ShopX")));
+
+            // 3. AutoMapper Configuration
+            builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+            // 4. Đăng ký IHttpContextAccessor (Cần cho việc đọc Header trong một số trường hợp)
+            builder.Services.AddHttpContextAccessor();
+            // Đăng ký GetID
+            builder.Services.AddScoped<ShopxEX1.Helpers.GetID>();
+
+            // 5. Application Services Registration (Đăng ký TẤT CẢ)
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<ISessionService, SessionService>();
+
+            // 6. Controller Configuration
+            builder.Services.AddControllers()
+                 .AddJsonOptions(options =>
+                 {
+                     options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles; // Hoặc Preserve
+                     options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never;
+                 });
+
+
+            // 7. JWT Authentication Configuration
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        // Cho phép lấy token từ query string (nếu cần)
+                        if (context.Request.Query.ContainsKey("access_token"))
+                        {
+                            context.Token = context.Request.Query["access_token"];
+                        }
+                        return Task.CompletedTask;
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                        {
+                            context.Response.Headers.Add("Token-Expired", "true");
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
+            // 8. Authorization Configuration
+            builder.Services.AddAuthorization(options =>
+            {
+                // Định nghĩa các policies ở đây nếu cần
+                // options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                // options.AddPolicy("SellerOnly", policy => policy.RequireRole("Seller"));
+            });
+
+
+            // 9. Swagger/OpenAPI Configuration
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen(option =>
+            {
+                option.SwaggerDoc("v1", new OpenApiInfo { Title = "ShopX API", Version = "v1" });
+
+                // --- Phần cấu hình JWT Bearer ---
+                // Định nghĩa Security Scheme tên là "Bearer"
+                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    In = ParameterLocation.Header, // Token được đặt trong Header
+                    Description = "Vui lòng nhập JWT với tiền tố Bearer vào ô bên dưới.\n\nVí dụ: \"Bearer {your_token}\"",
+                    Name = "Authorization", 
+                    Type = SecuritySchemeType.Http, 
+                    BearerFormat = "JWT",
+                    Scheme = "bearer"              
+                });
+
+                // Yêu cầu Security Scheme "Bearer" được áp dụng cho các API
+                option.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        // Tham chiếu đến Security Scheme "Bearer" đã định nghĩa ở trên
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme, // Loại tham chiếu là SecurityScheme
+                                Id = "Bearer"                        // ID phải khớp với tên đã định nghĩa ("Bearer")
+                            }
+                        },
+                        new string[]{} // Hoặc: new List<string>()
+                    }
+                });
+            });
+            var app = builder.Build();
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "ShopX API V1");
+                });
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                // Middleware xử lý lỗi tập trung
+                app.UseExceptionHandler(appBuilder =>
+                {
+                    appBuilder.Run(async context =>
+                    {
+                        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                        await context.Response.WriteAsync("Đã xảy ra lỗi không mong muốn."); // Thông báo chung
+                    });
+                });
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseRouting();
+
+            app.UseCors(MyAllowSpecificOrigins);
+
+            // Thêm middleware JWT trước UseAuthentication
+            app.UseMiddleware<JwtMiddleware>();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
         }
-    });
-});
-
-// Configure DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("ShopX")));
-
-// Configure CORS
-var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowSpecificOrigins",
-        builder => builder.WithOrigins(allowedOrigins)
-                         .AllowAnyMethod()
-                         .AllowAnyHeader());
-});
-
-// Configure AutoMapper
-builder.Services.AddAutoMapper(typeof(MappingProfile));
-
-// Configure JWT Authentication
-var jwtKey = builder.Configuration["Jwt:SecretKey"];
-if (string.IsNullOrEmpty(jwtKey))
-{
-    throw new InvalidOperationException("JWT Key is not configured in appsettings.json.");
-}
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-            NameClaimType = ClaimTypes.NameIdentifier,
-            RoleClaimType = ClaimTypes.Role
-        };
-    });
-
-builder.Services.AddAuthorization();
-
-// Configure services
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-// builder.Services.AddScoped<IUserService, UserService>();
-// builder.Services.AddScoped<IEmailService, EmailService>();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-app.UseCors("AllowSpecificOrigins");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-
-try
-{
-    using (var scope = app.Services.CreateScope())
-    {
-        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.EnsureCreatedAsync();
-        Console.WriteLine("Database connection successful.");
     }
 }
-catch (Exception ex)
-{
-    Console.WriteLine($"Database connection failed: {ex.Message}");
-    throw;
-}
-
-app.Run();

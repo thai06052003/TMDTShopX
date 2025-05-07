@@ -66,7 +66,7 @@ namespace ShopxEX1.Data
                 entity.HasKey(e => e.SellerCategoryID); // Khóa Chính
 
                 entity.HasOne(sc => sc.Seller) // Thuộc tính điều hướng đến Seller
-                      .WithMany(s => s.Categories) // Collection (Danh sách) trong Seller
+                      .WithMany(s => s.SellerCategories) // Collection (Danh sách) trong Seller
                       .HasForeignKey(sc => sc.SellerID) // Khóa Ngoại
                       .OnDelete(DeleteBehavior.Cascade); // Nếu Seller bị xóa, xóa các category của họ
 

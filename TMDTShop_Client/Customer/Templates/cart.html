@@ -47,7 +47,8 @@
                                 class="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 border border-gray-200"
                                 x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95"
                                 x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150"
-                                x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95">
+                                x-transition:leave-start="opacity-100 scale-100" 
+                                x-transition:leave-end="opacity-0 scale-95">
 
                                 <!-- Điện thoại & Phụ kiện -->
                                 <div class="relative submenu-group">
@@ -176,7 +177,7 @@
                                         <span>Tổng cộng:</span>
                                         <span id="cart-total" class="font-bold">0₫</span>
                                     </div>
-                                    <a href="giohang.html" @click="isCartOpen = false"
+                                    <a href="cart.html" @click="isCartOpen = false"
                                         class="block bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg transition">
                                         Thanh toán
                                     </a>
@@ -203,7 +204,7 @@
                             x-transition:leave-start="opacity-100 scale-100" 
                             x-transition:leave-end="opacity-0 scale-95">
                             <a href="info.html" @click="isOpen = false" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Tài khoản của tôi</a>
-                            <a href="admin.html" @click="isOpen = false" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Truy cập với quyền ADMIN</a>
+                            <a href="../../Admin/templates/seller.html" @click="isOpen = false" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Truy cập với quyền ADMIN</a>
                             <button id="logoutButton" class="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100" @click="logout(); isOpen = false">
                                 Đăng xuất
                             </button>
@@ -264,7 +265,7 @@
             </div>
             
             <div class="flex flex-col sm:flex-row justify-between space-y-4 sm:space-y-0">
-                <button class="px-6 py-3 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 transition">
+                <button onclick="window.location.href='index.html'" class="px-6 py-3 bg-gray-200 text-dark font-medium rounded-lg hover:bg-gray-300 transition">
                     <i class="fas fa-arrow-left mr-2"></i> Tiếp tục mua hàng
                 </button>
                 <div class="flex space-x-4">

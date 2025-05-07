@@ -8,7 +8,7 @@
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsActive { get; set; }
-        public virtual Seller? Seller { get; set; }
-        public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+        public virtual Seller? Seller { get; set; } // Quan hệ n-1
+        public virtual ICollection<Product> Products { get; set; } = new List<Product>(); // Quan hệ 1-n
     }
 }

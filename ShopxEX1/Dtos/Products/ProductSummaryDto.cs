@@ -9,7 +9,8 @@
         public string? ImageURL { get; set; }
         public int SellerID { get; set; }
         public int SellercategoryID { get; set; }
-
+        public bool IsActive { get; set; }
         public string? CategoryName { get; set; }
+        public int StockQuantity { get; set; }
     }
 }

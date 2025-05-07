@@ -14,8 +14,8 @@ namespace ShopxEX1.Dtos.Products
         [StringLength(4000)] public string? Description { get; set; }
         [Required][Range(0.01, double.MaxValue)][Column(TypeName = "decimal(18, 2)")] public decimal Price { get; set; }
         [Required][Range(0, int.MaxValue)] public int StockQuantity { get; set; }
-        // File upload thay vì string URL
-        public IFormFile? Image { get; set; }
+        [StringLength(255)] public string? ImageURL { get; set; }
+        public IFormFile? ImageFile { get; set; }
         public bool IsActive { get; set; } = true;
     }
 }

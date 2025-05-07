@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ShopxEX1.Dtos.Products;
 using ShopxEX1.Helpers;
-using System.Threading.Tasks;
-using ShopxEX1.Dtos;
 
 namespace ShopxEX1.Services
 {
@@ -17,6 +15,20 @@ namespace ShopxEX1.Services
         /// <param name="pageSize">Số lượng mục trên mỗi trang.</param>
         /// <returns>Kết quả phân trang chứa danh sách ProductSummaryDto.</returns>
         Task<PagedResult<ProductSummaryDto>> GetProductsAsync(ProductFilterDto? filter, int pageNumber, int pageSize);
+
+        /// <summary>
+        /// Lấy danh sách sản phẩm theo seller có phân trang và lọc.
+        /// </summary>
+        /// <param name="userId">Đối tượng chứa các tiêu chí lọc.</param>
+        /// <returns>Kết quả phân trang chứa danh sách ProductSummaryDto.</returns>
+        Task<PagedResult<ProductSummaryDto>> GetProductsBySellerAsync(ProductFilterDto? filter, int pageNumber, int pageSize, int userId);
+
+        /// <summary>
+        /// Lấy danh sách sản phẩm theo danh mục có phân trang và lọc.
+        /// </summary>
+        /// <param name="categoryId">Đối tượng chứa các tiêu chí lọc.</param>
+        /// <returns>Kết quả phân trang chứa danh sách ProductSummaryDto.</returns>
+        Task<PagedResult<ProductSummaryDto>> GetProductsByCategoryAsync(ProductFilterDto? filter, int pageNumber, int pageSize, int categoryId);
 
         /// <summary>
         /// Lấy thông tin chi tiết của một sản phẩm theo ID.
@@ -40,7 +52,7 @@ namespace ShopxEX1.Services
         /// <param name="sellerId">ID của người bán (để kiểm tra quyền sở hữu).</param>
         /// <param name="updateDto">DTO chứa thông tin cập nhật.</param>
         /// <returns>True nếu cập nhật thành công, False nếu không tìm thấy hoặc không có quyền.</returns>
-        Task<ApiResponse> UpdateProductAsync(int productId, int sellerId, ProductUpdateDto updateDto); // Dùng void và ném exception
+        Task<bool> UpdateProductAsync(int productId, int sellerId, ProductUpdateDto updateDto); // Dùng void và ném exception
 
         /// <summary>
         /// Xóa (hoặc đánh dấu là không hoạt động) một sản phẩm.

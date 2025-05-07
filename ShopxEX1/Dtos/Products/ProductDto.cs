@@ -11,9 +11,10 @@ namespace ShopxEX1.Dtos.Products
         public decimal Price { get; set; }
         public int StockQuantity { get; set; } // User cần biết còn hàng không
         public string? ImageURL { get; set; }
+        public bool IsActive { get; set; }
         // --- Thông tin cần JOIN từ Service ---
         public string? CategoryName { get; set; }
-        public int? SellerCategoryID { get; set; }
-        public bool IsActive { get; set; }
+        public string? SellerStoreName { get; set; } // Tên cửa hàng bán
+        public int SellerCategoryID { get; set; } // Cần ID để liên kết
     }
 }

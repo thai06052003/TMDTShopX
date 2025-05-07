@@ -1,4 +1,26 @@
 document.addEventListener('DOMContentLoaded', function () {
+  const submenuGroups = document.querySelectorAll('.submenu-group');
+
+  submenuGroups.forEach(group => {
+    const submenu = group.querySelector('.submenu');
+    group.addEventListener('mouseenter', () => submenu.style.display = 'block');
+    group.addEventListener('mouseleave', () => submenu.style.display = 'none');
+  });
+
+  document.getElementById('cartButton')?.addEventListener('click', function () {
+    this.querySelector('.cart-dropdown')?.classList.toggle('active');
+  });
+
+  const fadeElements = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+  fadeElements.forEach(element => observer.observe(element));
+
   // Hàm tiện ích cho cookie
   function setCookie(name, value, days) {
       let expires = "";
@@ -24,31 +46,6 @@ document.addEventListener('DOMContentLoaded', function () {
   function deleteCookie(name) {
       document.cookie = name + '=; Max-Age=-99999999; path=/';
   }
-
-  // Xử lý submenu
-  const submenuGroups = document.querySelectorAll('.submenu-group');
-
-  submenuGroups.forEach(group => {
-      const submenu = group.querySelector('.submenu');
-      group.addEventListener('mouseenter', () => submenu.style.display = 'block');
-      group.addEventListener('mouseleave', () => submenu.style.display = 'none');
-  });
-
-  // Xử lý giỏ hàng
-  document.getElementById('cartButton')?.addEventListener('click', function () {
-      this.querySelector('.cart-dropdown')?.classList.toggle('active');
-  });
-
-  // Hiệu ứng fade-in
-  const fadeElements = document.querySelectorAll('.fade-in');
-  const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-          if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-          }
-      });
-  }, { threshold: 0.1 });
-  fadeElements.forEach(element => observer.observe(element));
 
   // Xử lý menu tài khoản
   const userMenu = document.getElementById('userMenu');
@@ -88,20 +85,78 @@ document.addEventListener('DOMContentLoaded', function () {
           });
       });
   }
- // Hiển thị tên tài khoản trong header
- function displayAccountName() {
+
+  // Hiển thị tên tài khoản trong header
+  function displayAccountName() {
     const accountNameElement = document.getElementById('accountName');
     const userNameElement = document.getElementById('userName');
-    const userName = getCookie('userName') || 'Tài khoản'; // Lấy tên từ cookie, mặc định là "Tài khoản"
+    const token = getCookie('token');
+    const isLoggedIn = getCookie('isLoggedIn');
+
+    if (!token || isLoggedIn !== 'true') {
+        if (accountNameElement) accountNameElement.textContent = 'Tài khoản';
+        if (userNameElement) userNameElement.textContent = 'Tài khoản';
+        return;
+    }
+
+    const userName = getCookie('userName') || 'Tài khoản';
 
     if (accountNameElement) {
-        accountNameElement.textContent = userName; // Cập nhật tên trong header
+        accountNameElement.textContent = userName;
     }
     if (userNameElement) {
-        userNameElement.textContent = userName; // Cập nhật tên trong dropdown
+        userNameElement.textContent = userName;
     }
-}
-displayAccountName();
+  }
+
+  // Kiểm tra trạng thái đăng nhập khi trang được tải
+  async function checkLoginStatus() {
+    const token = getCookie('token');
+    const isLoggedIn = getCookie('isLoggedIn');
+
+    if (!token || isLoggedIn !== 'true') {
+        console.log('Chưa đăng nhập');
+        return;
+    }
+
+    try {
+        const response = await fetch('https://localhost:7088/api/Auth/check-auth', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.log('Token không hợp lệ, xóa thông tin đăng nhập');
+            deleteCookie('token');
+            deleteCookie('isLoggedIn');
+            deleteCookie('userName');
+            deleteCookie('userEmail');
+            deleteCookie('userPhone');
+            deleteCookie('userBirthdate');
+            deleteCookie('userGender');
+            deleteCookie('userAddress');
+            displayAccountName();
+            return;
+        }
+
+        const data = await response.json();
+        if (data.isAuthenticated && data.user) {
+            setCookie('userName', data.user.fullName, 7);
+            setCookie('userEmail', data.user.email, 7);
+            setCookie('userPhone', data.user.phone || '', 7);
+            setCookie('userBirthdate', data.user.birthday || '', 7);
+            setCookie('userGender', data.user.gender || '', 7);
+            setCookie('userAddress', data.user.address || '', 7);
+            displayAccountName();
+        }
+    } catch (error) {
+        console.error('Lỗi khi kiểm tra trạng thái đăng nhập:', error);
+    }
+  }
+
   // Đăng xuất
   const logoutButton = document.getElementById("logoutButton");
 
@@ -110,7 +165,7 @@ displayAccountName();
           const token = getCookie("token");
 
           try {
-              await fetch("https://localhost:5191/api/Auth/logout", {
+              await fetch("https://localhost:7088/api/Auth/logout", {
                   method: "POST",
                   headers: {
                       "Content-Type": "application/json",
@@ -118,9 +173,15 @@ displayAccountName();
                   }
               });
 
-              // Xóa Ascending sẽ sử dụng cookie thay vì sessionStorage
+              // Xóa tất cả cookie
               deleteCookie("token");
-              deleteCookie("user");
+              deleteCookie("isLoggedIn");
+              deleteCookie("userName");
+              deleteCookie("userEmail");
+              deleteCookie("userPhone");
+              deleteCookie("userBirthdate");
+              deleteCookie("userGender");
+              deleteCookie("userAddress");
 
               // Chuyển hướng về trang đăng nhập
               window.location.href = "login.html";
@@ -130,4 +191,59 @@ displayAccountName();
           }
       });
   }
+
+  // Kiểm tra trạng thái đăng nhập khi trang được tải
+  checkLoginStatus();
+  displayAccountName();
 });
+
+function getRoleFromToken() {
+    // 1. Lấy token từ Session Storage
+    const token = sessionStorage.getItem('token');
+
+    if (!token) {
+        console.error('Không tìm thấy token trong Session Storage.');
+        return null; // Hoặc trả về giá trị mặc định/xử lý lỗi khác
+    }
+
+    try {
+        // 2. Tách lấy phần payload (phần thứ 2)
+        // Phần payload là chuỗi Base64Url
+        const payloadBase64Url = token.split('.')[1];
+        if (!payloadBase64Url) {
+            console.error('Định dạng token không hợp lệ: Thiếu payload.');
+            return null;
+        }
+
+
+        // 3. Chuyển đổi Base64Url thành Base64 chuẩn (thay thế '-' bằng '+' và '_' bằng '/')
+        let payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
+
+        // Thêm padding '=' nếu cần thiết (Base64 yêu cầu độ dài là bội số của 4)
+        // Hàm atob cần điều này
+        const padding = payloadBase64.length % 4;
+        if (padding) {
+            payloadBase64 += '='.repeat(4 - padding);
+        }
+
+        // Giải mã Base64 thành chuỗi JSON
+        const decodedPayloadString = atob(payloadBase64); // atob là hàm có sẵn của trình duyệt
+
+        // 4. Phân tích chuỗi JSON thành đối tượng JavaScript
+        const payloadObject = JSON.parse(decodedPayloadString);
+
+        // 5. Lấy giá trị của thuộc tính 'role'
+        const userRole = payloadObject.role;
+
+        if (userRole === undefined) {
+            console.warn('Thuộc tính "role" không tồn tại trong payload của token.');
+            return null; // Hoặc giá trị mặc định
+        }
+
+        return userRole;
+
+    } catch (error) {
+        console.error('Lỗi khi giải mã hoặc phân tích token:', error);
+        return null; // Xử lý lỗi
+    }
+}
