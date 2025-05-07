@@ -497,11 +497,8 @@ document.addEventListener('DOMContentLoaded', async function() {
                     throw new Error('Token không tồn tại hoặc đã hết hạn. Vui lòng đăng nhập lại.');
                 }
 
-<<<<<<< HEAD
-                const userResponse = await fetch('https://localhost:7088/api/Auth/user-info', {
-=======
                 const userResponse = await fetch(`${API_BASE}/check-auth`, {
->>>>>>> c3290253cbadaa517fdd883a28cbde6c837846d2
+
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -528,13 +525,9 @@ document.addEventListener('DOMContentLoaded', async function() {
                     body.email = email;
                 }
 
-<<<<<<< HEAD
-                const response = await fetch('https://localhost:7088/api/Auth/update', {
-=======
                 console.log('Sending update request with body:', body);
 
                 const response = await fetch(`${API_BASE}/update-profile`, {
->>>>>>> c3290253cbadaa517fdd883a28cbde6c837846d2
                     method: 'PUT',
                     headers: {
                         'Authorization': `Bearer ${token}`,
