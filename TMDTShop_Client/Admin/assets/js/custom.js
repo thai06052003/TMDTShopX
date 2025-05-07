@@ -4,6 +4,6 @@ async function loadComponent(id, file) {
     document.getElementById(id).innerHTML = text;
 }
 
-loadComponent('sidebar', '/Admin/components/sidebar.html');
-loadComponent('header', '/Admin/components/header.html');
-loadComponent('footer', '/Admin/components/footer.html');
+loadComponent('sidebar', '../../components/sidebar.html');
+loadComponent('header', '../../components/header.html');
+loadComponent('footer', '../../components/footer.html');
