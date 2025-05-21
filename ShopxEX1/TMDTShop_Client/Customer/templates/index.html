@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trang chủ - ShopX</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="icon" type="image/png" href="/Customer/assets/images/logo.jpg">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+
+<body class="bg-gray-50">
+  <!-- Header Container -->
+  <div id="header-container"></div>
+
+  <!-- Main Content -->
+  <main class="container mx-auto px-4 py-8">
+    <!-- Your existing content here -->
+    <!-- Hero Banner -->
+    <section class="relative bg-gray-800">
+      <!-- background-image-keyword: shopping banner; background-image-color: black -->
+      <div class="absolute inset-0 bg-gradient-to-r from-black via-transparent to-transparent z-10"></div>
+      <div class="absolute inset-0 bg-cover bg-center opacity-70"
+        style="background-image: url('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=1920&amp;q=80')">
+      </div>
+
+      <div class="container mx-auto px-4 py-24 relative z-20">
+        <div class="max-w-xl">
+          <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Siêu sale tháng 11</h1>
+          <p class="text-gray-300 mb-6">Giảm giá lên đến 50% cho tất cả sản phẩm điện tử. Ưu đãi chỉ có trong tháng này!
+          </p>
+          <a href="promotion.html"
+            class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition transform hover:scale-105">
+            Mua ngay <i class="fas fa-arrow-right ml-2"></i>
+          </a>
+        </div>
+      </div>
+    </section>
+    <!-- Danh mục sản phẩm -->
+    <section class="py-12 bg-white" id="category">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-bold">Danh mục sản phẩm</h2>
+          <div class="flex space-x-2">
+            <button id="scrollCategoryLeft"
+              class="scroll-btn bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="scrollCategoryRight"
+              class="scroll-btn bg-gray-200 hover:bg-gray-300 text-gray-700 p-2 rounded-full disabled:opacity-50 disabled:cursor-not-allowed">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="category-scroll-container"> <!-- Container cha (tùy chọn) -->
+          <div id="categoryGridWrapper"> <!-- Container để cuộn -->
+            <div id="categoryGrid" class="flex flex-nowrap gap-4 py-1">
+              <!-- Thêm py-1 để thấy rõ hơn, và flex-nowrap -->
+              <!-- Danh mục sẽ được chèn vào đây bởi JavaScript -->
+              <p id="categoryLoading" class="text-center text-gray-500 whitespace-nowrap px-4">Đang tải danh mục...</p>
+            </div>
+          </div>
+        </div>
+        <!-- </div> --> <!-- ĐÓNG GRID LAYOUT BỊ BỎ -->
+      </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-center mb-8">
+          <h2 class="text-2xl font-bold">Sản phẩm nổi bật</h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 featured-products-container" id="featuredProductsContainer">
+          <!-- Sản phẩm sẽ được tải từ API và hiển thị ở đây -->
+          <div class="col-span-full text-center py-4" id="featuredLoading">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="mt-2 text-gray-500">Đang tải sản phẩm nổi bật...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Banner -->
+    <section class="py-12 bg-white">
+      <div class="container mx-auto px-4">
+        <div
+          class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-8 md:p-12 flex flex-col md:flex-row items-center">
+          <div class="md:w-1/2 mb-6 md:mb-0">
+            <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">Nhận ngay ưu đãi 10%</h2>
+            <p class="text-blue-100 mb-6">Đăng ký nhận bản tin của chúng tôi để nhận ngay mã giảm giá 10% cho đơn hàng
+              đầu
+              tiên.</p>
+            <div class="flex">
+              <input type="email" placeholder="Nhập email của bạn"
+                class="bg-white/20 text-white placeholder-blue-200 border border-blue-400 rounded-l-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300 w-full">
+              <button
+                class="bg-yellow-400 hover:bg-yellow-500 text-blue-800 font-bold px-6 rounded-r-lg transition">Gửi</button>
+            </div>
+          </div>
+          <div class="md:w-1/2 flex justify-center">
+            <img data-image-keyword="discount" data-image-color="yellow"
+              src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&amp;ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&amp;auto=format&amp;fit=crop&amp;w=500&amp;q=80"
+              class="w-64 h-64 object-contain">
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- New Arrivals -->
+    <section class="py-12 bg-gray-50">
+      <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-bold">Sản phẩm mới</h2>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 new-arrivals-container" id="newArrivalsContainer">
+          <!-- Sản phẩm sẽ được tải từ API và hiển thị ở đây -->
+          <div class="col-span-full text-center py-4" id="newArrivalsLoading">
+            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <p class="mt-2 text-gray-500">Đang tải sản phẩm mới...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chatbot -->
+    <div class="fixed bottom-6 right-6 z-50">
+      <button
+        class="bg-blue-600 hover:bg-blue-700 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition transform hover:scale-110">
+        <i class="fas fa-robot text-2xl"></i>
+      </button>
+    </div>
+  </main>
+
+  <!-- Footer Container -->
+  <div id="footer-container"></div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/index.js"></script>
+  <script type="module" src="../assets/js/components.js"></script>
+  <script>
+    // Logic JavaScript dành riêng cho trang index.html (trang chủ Customer)
+    document.addEventListener('DOMContentLoaded', () => {
+      // === START: LOGIC CHO DANH MỤC (giữ nguyên từ file HTML của bạn) ===
+      const categoryGridWrapper = document.getElementById('categoryGridWrapper');
+      const categoryGrid = document.getElementById('categoryGrid');
+      const categoryLoading = document.getElementById('categoryLoading');
+      const scrollCategoryLeftBtn = document.getElementById('scrollCategoryLeft');
+      const scrollCategoryRightBtn = document.getElementById('scrollCategoryRight');
+
+      async function fetchAndDisplayCategories() {
+        if (!categoryGrid || !categoryLoading || !categoryGridWrapper) return;
+        categoryLoading.style.display = 'block';
+        categoryGrid.innerHTML = '';
+        categoryGrid.appendChild(categoryLoading);
+
+        try {
+          // API_BASE_URL, getImageUrl, setSession được lấy từ index.js
+          const response = await fetch(`${API_BASE_URL}/Categories/all`);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const categories = await response.json();
+          categoryGrid.innerHTML = '';
+
+          if (categories && categories.length > 0) {
+            categories.forEach(category => {
+              const imageUrl = getImageUrl(category.image);
+              const linkElement = document.createElement('a');
+              linkElement.href = `/Customer/templates/category-products.html?categoryId=${category.categoryID}&categoryName=${encodeURIComponent(category.categoryName)}`;
+              linkElement.className = "bg-white hover:shadow-lg rounded-lg p-4 text-center transition transform hover:scale-105 border border-gray-200 flex flex-col items-center justify-start group w-32 sm:w-36 flex-shrink-0";
+              linkElement.innerHTML = `
+                              <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center mx-auto mb-2 overflow-hidden border border-gray-100 group-hover:border-blue-300">
+                                  <img src="${imageUrl}" alt="${category.categoryName}" class="w-full h-full object-cover">
+                              </div>
+                              <h3 class="font-medium text-xs sm:text-sm text-gray-700 group-hover:text-blue-600 mt-1 line-clamp-2">${category.categoryName}</h3>`;
+              linkElement.addEventListener('click', function (event) {
+                event.preventDefault();
+                setSession('categoryName', category.categoryName);
+                setSession('categoryId', category.categoryID.toString());
+                window.location.href = this.href;
+              });
+              categoryGrid.appendChild(linkElement);
+            });
+            categoryGridWrapper.scrollLeft = 0;
+            updateScrollButtonsState();
+          } else {
+            categoryGrid.innerHTML = '<p class="text-center text-gray-500 whitespace-nowrap">Không có danh mục.</p>';
+            disableScrollButtons();
+          }
+        } catch (error) {
+          console.error('Lỗi tải danh mục:', error);
+          if (categoryGrid) categoryGrid.innerHTML = `<p class="text-center text-red-500 whitespace-nowrap">Lỗi tải danh mục.</p>`;
+          disableScrollButtons();
+        }
+      }
+      function disableScrollButtons() {
+        if (scrollCategoryLeftBtn) scrollCategoryLeftBtn.disabled = true;
+        if (scrollCategoryRightBtn) scrollCategoryRightBtn.disabled = true;
+      }
+
+      function updateScrollButtonsState() {
+        if (!categoryGridWrapper || !scrollCategoryLeftBtn || !scrollCategoryRightBtn) return;
+
+        const scrollLeft = categoryGridWrapper.scrollLeft;
+        const scrollWidth = categoryGridWrapper.scrollWidth;
+        const clientWidth = categoryGridWrapper.clientWidth;
+
+        scrollCategoryLeftBtn.disabled = scrollLeft <= 0;
+        scrollCategoryRightBtn.disabled = scrollLeft >= (scrollWidth - clientWidth - 1); // -1 để xử lý sai số nhỏ
+      }
+      if (scrollCategoryLeftBtn && scrollCategoryRightBtn && categoryGridWrapper) {
+        const scrollAmount = 1000; // Độ rộng cuộn mỗi lần click, bạn có thể điều chỉnh
+
+        scrollCategoryLeftBtn.addEventListener('click', () => {
+          categoryGridWrapper.scrollLeft -= scrollAmount;
+        });
+
+        scrollCategoryRightBtn.addEventListener('click', () => {
+          categoryGridWrapper.scrollLeft += scrollAmount;
+        });
+
+        // Cập nhật trạng thái nút khi người dùng cuộn thủ công (nếu có thanh cuộn)
+        categoryGridWrapper.addEventListener('scroll', updateScrollButtonsState);
+      }
+      fetchAndDisplayCategories();
+      // === END: LOGIC CHO DANH MỤC ===
+
+
+      // === START: LOGIC CHO SẢN PHẨM NỔI BẬT VÀ SẢN PHẨM MỚI ===
+      const featuredProductsContainer = document.getElementById('featuredProductsContainer');
+      const newArrivalsContainer = document.getElementById('newArrivalsContainer');
+      const featuredLoading = document.getElementById('featuredLoading');
+      const newArrivalsLoading = document.getElementById('newArrivalsLoading');
+
+
+      /**
+       * Tạo HTML cho thẻ sản phẩm (có thể tùy chỉnh thêm class nếu cần)
+       */
+      function createProductCardHTML(product, isNew = false) {
+        const productUrl = `/Customer/templates/product-detail.html?productId=${product.productID}`;
+        const imageUrl = getImageUrl(product.imageURL); // Từ index.js
+        const formattedPrice = formatCurrency(product.price); // Từ index.js
+
+        let newTagHtml = '';
+        if (isNew) {
+          const createdAt = new Date(product.createdAt);
+          const sevenDaysAgo = new Date();
+          sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+          if (createdAt >= sevenDaysAgo) {
+            newTagHtml = '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded z-10">MỚI</span>';
+          }
+        }
+
+        // Sử dụng product.shopName nếu API trả về, nếu không thì fallback hoặc gọi getShopNameBySellerId
+        // ProductSummaryDto đã có ShopName, nên ta dùng trực tiếp.
+        const shopNameDisplay = product.shopName || (product.sellerID ? `Shop ID ${product.sellerID}` : 'ShopX');
+
+
+        return `
+                  <div class="product-card bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group relative">
+                      ${newTagHtml}
+                      <a href="${productUrl}" class="block">
+                          <img src="${imageUrl}" alt="${product.productName}" class="w-full h-48 object-cover group-hover:opacity-80 transition-opacity">
+                      </a>
+                      <div class="p-3 md:p-4">
+                          <a href="/Customer/templates/seller-profile.html?sellerId=${product.sellerID}" class="text-gray-500 hover:text-blue-600 text-xs block mb-1 truncate" title="${shopNameDisplay}">
+                              <i class="fas fa-store fa-xs mr-1 text-gray-400"></i>${shopNameDisplay}
+                          </a>
+                          <h3 class="text-sm font-semibold text-gray-800 mb-1 h-10 overflow-hidden line-clamp-2" title="${product.productName}">
+                              <a href="${productUrl}" class="hover:text-blue-600">${product.productName}</a>
+                          </h3>
+                          <p class="text-indigo-600 font-bold text-md mb-2">${formattedPrice}</p>
+                          <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+                              <span>Còn lại: ${product.stockQuantity > 0 ? product.stockQuantity : 'Hết hàng'}</span>
+                              <!-- <span>Đã bán: ${product.soldQuantity || 0}</span> -->
+                          </div>
+                          <button 
+                              onclick="handleAddToCart(${product.productID}, '${product.productName.replace(/'/g, "\\'")}', 1, ${product.price}, '${imageUrl}')"
+                              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-3 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 ${product.stockQuantity > 0 ? '' : 'opacity-50 cursor-not-allowed'}"
+                              ${product.stockQuantity > 0 ? '' : 'disabled'}>
+                              <i class="fas fa-cart-plus mr-1.5"></i>${product.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
+                          </button>
+                      </div>
+                  </div>
+              `;
+      }
+
+      async function loadProductSection(apiUrl, containerElement, loadingElement, noProductsText, isNewProductSection = false) {
+        if (!containerElement || !loadingElement) {
+          console.warn("Product container or loading element not found for", apiUrl);
+          return;
+        }
+        loadingElement.style.display = 'block';
+        containerElement.innerHTML = ''; // Xóa sản phẩm cũ (nếu có, trừ loading)
+        containerElement.appendChild(loadingElement);
+
+
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+          const products = await response.json(); // API trả về List<ProductSummaryDto>
+
+          loadingElement.style.display = 'none'; // Ẩn loading
+          containerElement.innerHTML = ''; // Xóa hẳn loading element
+
+          if (products && products.length > 0) {
+            products.forEach(product => {
+              const productCardHtml = createProductCardHTML(product, isNewProductSection);
+              containerElement.insertAdjacentHTML('beforeend', productCardHtml);
+            });
+          } else {
+            containerElement.innerHTML = `<div class="col-span-full text-center py-4 text-gray-500">${noProductsText}</div>`;
+          }
+        } catch (error) {
+          console.error(`Lỗi tải sản phẩm từ ${apiUrl}:`, error);
+          loadingElement.style.display = 'none';
+          containerElement.innerHTML = `<div class="col-span-full text-center py-4 text-red-500">Không thể tải sản phẩm. Vui lòng thử lại sau.</div>`;
+        }
+      }
+
+      async function loadFeaturedProducts() {
+        const apiUrl = `${API_BASE_URL}/Products/best-selling`;
+        await loadProductSection(apiUrl, featuredProductsContainer, featuredLoading, "Chưa có sản phẩm bán chạy.", false);
+      }
+
+      async function loadNewArrivals() {
+        const apiUrl = `${API_BASE_URL}/Products/newest`;
+        await loadProductSection(apiUrl, newArrivalsContainer, newArrivalsLoading, "Chưa có sản phẩm mới.", true);
+      }
+
+      window.handleAddToCart = async function (productId, productName, quantity = 1, price, imageUrl) {
+        console.log(`Thêm vào giỏ: ID ${productId}, Tên: ${productName}, SL: ${quantity}`);
+        const token = getSession('token'); // getSession từ index.js
+        if (!token) {
+          alert("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng.");
+          setSession('addToCartAfterLogin', JSON.stringify({ productId, quantity }));
+          window.location.href = "/Customer/templates/login.html?redirect=" + encodeURIComponent(window.location.pathname + window.location.search);
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/Cart/items`, { // API_BASE_URL từ index.js
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ ProductId: productId, Quantity: quantity })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            alert(`Đã thêm "${productName}" vào giỏ hàng!`);
+            if (typeof window.updateCartDropdown === 'function') { // updateCartDropdown từ index.js
+              window.updateCartDropdown();
+            }
+            document.dispatchEvent(new CustomEvent('cartUpdated'));
+          } else {
+            const errorData = await response.json();
+            alert(`Không thể thêm vào giỏ hàng: ${errorData.message || response.statusText}`);
+          }
+        } catch (error) {
+          console.error("Lỗi khi thêm vào giỏ hàng:", error);
+          alert("Đã xảy ra lỗi khi thêm sản phẩm vào giỏ hàng.");
+        }
+      };
+
+      // Gọi các hàm tải sản phẩm
+      // Đảm bảo các hàm toàn cục từ index.js đã sẵn sàng
+      if (typeof API_BASE_URL !== 'undefined' && typeof getImageUrl === 'function' && typeof formatCurrency === 'function') {
+        loadFeaturedProducts();
+        loadNewArrivals();
+      } else {
+        console.error("Chưa sẵn sàng tải sản phẩm, các hàm/biến toàn cục từ index.js bị thiếu.");
+        // Hiển thị thông báo lỗi trên UI nếu cần
+        if (featuredProductsContainer) featuredProductsContainer.innerHTML = `<div class="col-span-full text-center py-4 text-red-500">Lỗi tải trang.</div>`;
+        if (newArrivalsContainer) newArrivalsContainer.innerHTML = `<div class="col-span-full text-center py-4 text-red-500">Lỗi tải trang.</div>`;
+      }
+      // === END: LOGIC CHO SẢN PHẨM NỔI BẬT VÀ SẢN PHẨM MỚI ===
+    });
+  </script>
+</body>
+
+</html>

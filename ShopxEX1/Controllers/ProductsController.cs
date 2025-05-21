@@ -26,7 +26,7 @@ namespace ShopxEX1.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách sản phẩm có phân trang và lọc.
+        /// Lấy danh sách sản phẩm có phân trang và lọc (trang admin).
         /// </summary>
         /// <param name="filter">Tiêu chí lọc sản phẩm.</param>
         /// <param name="pageNumber">Số trang (mặc định 1).</param>
@@ -58,7 +58,41 @@ namespace ShopxEX1.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý yêu cầu.");
             }
         }
+        /// <summary>
+        /// Lấy danh sách sản phẩm có phân trang và lọc (trang customer).
+        /// </summary>
+        /// <param name="filter">Tiêu chí lọc sản phẩm.</param>
+        /// <param name="pageNumber">Số trang (mặc định 1).</param>
+        /// <param name="pageSize">Số lượng mục trên trang (mặc định 10).</param>
+        /// <returns>Danh sách sản phẩm tóm tắt có phân trang.</returns>
+        [HttpGet("Customer")]
+        public async Task<ActionResult<PagedResult<ProductSummaryDto>>> GetProductsByCustomerPage([FromQuery] ProductFilterDto filter, [FromQuery] int pageNumber = 1, [FromQuery] string pageSizeInput = "10")
+        {
+            bool customerPage = true;
+            const int MaxPageSize = 100;
+            int pageSize;
 
+            if (!int.TryParse(pageSizeInput, out pageSize))
+            {
+                pageSize = MaxPageSize; // Đặt về mặc định
+            }
+
+            // Đảm bảo pageNumber và pageSize hợp lệ
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1 || pageSize > MaxPageSize) pageSize = MaxPageSize;
+
+            try
+            {
+                var result = await _productService.GetProductsAsync(filter, pageNumber, pageSize, customerPage);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi xảy ra khi lấy danh sách sản phẩm.");
+                // Trả về lỗi chung cho client, chi tiết lỗi đã được log
+                return StatusCode(StatusCodes.Status500InternalServerError, "Đã xảy ra lỗi trong quá trình xử lý yêu cầu.");
+            }
+        }
         /// <summary>
         /// Lấy danh sách sản phẩm có phân trang và lọc.
         /// </summary>
@@ -105,7 +139,7 @@ namespace ShopxEX1.Controllers
         /// <param name="pageNumber">Số trang (mặc định 1).</param>
         /// <param name="pageSize">Số lượng mục trên trang (mặc định 10).</param>
         /// <returns>Danh sách sản phẩm tóm tắt có phân trang.</returns>
-        [HttpGet("/category/{categoryId}")]
+        [HttpGet("Category/{categoryId}")]
         public async Task<ActionResult<PagedResult<ProductSummaryDto>>> GetProductsByCategory(int categoryId, [FromQuery] ProductFilterDto filter, [FromQuery] int pageNumber = 1, [FromQuery] string pageSizeInput = "10")
         {
             const int MaxPageSize = 100;
@@ -239,14 +273,14 @@ namespace ShopxEX1.Controllers
         [Authorize(Roles = "Seller, Admin")] // Chỉ Seller và Admin mới được xóa
         public async Task<IActionResult> DeleteProduct(int productId, [FromQuery] string status = "notActive")
         {
-            int? sellerId = _getId.GetSellerId();
-            if (!sellerId.HasValue) throw new Exception($"Bạn không phải là Seller.");
+            int? sellerId = _getId.GetSellerId() ?? 0;
+            if (sellerId != 0 && status == "delete") throw new Exception("Bạn không có quyền xóa sản phẩm");
 
             // Kiểm tra giá trị status hợp lệ
             status = status.ToLowerInvariant();
-            if (status != "delete" && status != "notactive")
+            if (status != "delete" && status != "notactive" && status != "active")
             {
-                return BadRequest("Giá trị tham số 'status' không hợp lệ. Chỉ chấp nhận 'delete' hoặc 'notActive'.");
+                return BadRequest("Giá trị tham số 'status' không hợp lệ.");
             }
 
             try

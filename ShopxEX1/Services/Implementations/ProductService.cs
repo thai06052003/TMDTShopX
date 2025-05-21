@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Security.Claims;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ShopxEX1.Services.Implementations
 {
@@ -18,6 +19,7 @@ namespace ShopxEX1.Services.Implementations
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly GetID getID;
 
         public ProductService(AppDbContext context, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
@@ -42,11 +44,22 @@ namespace ShopxEX1.Services.Implementations
             return user?.IsInRole("Admin") ?? false;
         }
 
-        public async Task<PagedResult<ProductSummaryDto>> GetProductsAsync(ProductFilterDto? filter, int pageNumber, int pageSize)
+        public async Task<PagedResult<ProductSummaryDto>> GetProductsAsync(ProductFilterDto? filter, int pageNumber, int pageSize, bool customerPage = false)
         {
-            var query = _context.Products
-                              .Include(p => p.Category)
-                              .Where(p => p.IsActive);
+            IQueryable<Product> query = null;
+            if (customerPage)
+            {
+                query = _context.Products
+                                  .Include(p => p.Category)
+                                  .Include(p => p.Seller)
+                                  .Where(p => p.IsActive == true);
+            }                   
+            else
+            {
+                query = _context.Products
+                                  .Include(p => p.Category)
+                                  .Include(p => p.Seller);
+            }
 
             if (!string.IsNullOrWhiteSpace(filter?.SearchTerm))
             {
@@ -92,6 +105,10 @@ namespace ShopxEX1.Services.Implementations
                         orderByExpression = p => p.ProductName;
                         ascending = true;
                         break;
+                    case "createdatdesc":
+                        orderByExpression = p => p.CreatedAt;
+                        ascending = false;
+                        break;
                 }
             }
 
@@ -113,7 +130,6 @@ namespace ShopxEX1.Services.Implementations
             var productDtos = _mapper.Map<IEnumerable<ProductSummaryDto>>(items);
             return new PagedResult<ProductSummaryDto>(productDtos, pageNumber, pageSize, totalCount);
         }
-
         public async Task<ProductDto?> GetProductByIdAsync(int productId)
         {
             var product = await _context.Products
@@ -222,9 +238,12 @@ namespace ShopxEX1.Services.Implementations
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {productId}.");
             }
 
-            if (existingProduct.SellerID != sellerId)
+            if (!IsAdmin())
             {
-                throw new UnauthorizedAccessException($"Người bán ID {sellerId} không có quyền xóa sản phẩm ID {productId}.");
+                if (existingProduct.SellerID != sellerId)
+                {
+                    throw new UnauthorizedAccessException($"Người bán ID {sellerId} không có quyền xóa sản phẩm ID {productId}.");
+                }
             }
 
             if (status == "delete")
@@ -232,7 +251,7 @@ namespace ShopxEX1.Services.Implementations
                 _context.Products.Remove(existingProduct);
                 return await _context.SaveChangesAsync() > 0;
             }
-            else
+            else if (status == "notactive")
             {
                 if (existingProduct.IsActive)
                 {
@@ -241,13 +260,22 @@ namespace ShopxEX1.Services.Implementations
                 }
                 return true;
             }
+            else if (status == "active")
+            {
+                if (!(existingProduct.IsActive))
+                {
+                    existingProduct.IsActive = true;
+                    return await _context.SaveChangesAsync() > 0;
+                }
+                return true;
+            }
+            return false;
         }
 
         public async Task<PagedResult<ProductSummaryDto>> GetProductsBySellerAsync(ProductFilterDto? filter, int pageNumber, int pageSize, int userId)
         {
-            var query = _context.Products
-                              .Include(p => p.Category)
-                              .Where(p => p.IsActive && p.SellerID == userId);
+            IQueryable<Product> query = _context.Products
+                              .Include(p => p.Category);
 
             if (!string.IsNullOrWhiteSpace(filter?.SearchTerm))
             {
@@ -282,9 +310,10 @@ namespace ShopxEX1.Services.Implementations
 
         public async Task<PagedResult<ProductSummaryDto>> GetProductsByCategoryAsync(ProductFilterDto? filter, int pageNumber, int pageSize, int categoryId)
         {
-            var query = _context.Products
+            IQueryable<Product> query = _context.Products
                               .Include(p => p.Category)
-                              .Where(p => p.IsActive && p.CategoryID == categoryId);
+                              .Where(p => p.IsActive == true)
+                              .Where(p => p.CategoryID == categoryId);
 
             if (!string.IsNullOrWhiteSpace(filter?.SearchTerm))
             {
